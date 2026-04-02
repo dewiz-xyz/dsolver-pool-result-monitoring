@@ -1,0 +1,325 @@
+{
+    "request_id": "req-1234",
+    "data": [
+        {
+            "pool": "0x0b1c2dcbbfa744ebd3fc17ff1a96a1e1eb4b2d69",
+            "pool_name": "uniswap_v3::WETH/USDC",
+            "pool_address": "0x0b1c2dcbbfa744ebd3fc17ff1a96a1e1eb4b2d69",
+            "amounts_out": [
+                "2027757016",
+                "4050394134",
+                "5059798786",
+                "10087779275"
+            ],
+            "slippage": [
+                5,
+                5,
+                12,
+                10
+            ],
+            "limit_max_in": "401285122903946897755155563591429",
+            "limit_max_out": "469477502330",
+            "gas_used": [
+                132000,
+                132000,
+                132000,
+                132000
+            ],
+            "block_number": 44176879
+        },
+        {
+            "pool": "0x56aeaf4af2df4bdfd9d865830fefdd278b25e7ef",
+            "pool_name": "aerodrome_slipstreams::WETH/USDC",
+            "pool_address": "0x56aeaf4af2df4bdfd9d865830fefdd278b25e7ef",
+            "amounts_out": [
+                "2009591113",
+                "3996022216",
+                "4980677520",
+                "9785190237"
+            ],
+            "slippage": [
+                18,
+                16,
+                57,
+                46
+            ],
+            "limit_max_in": "5968485069834626139",
+            "limit_max_out": "11638913227",
+            "gas_used": [
+                132000,
+                132000,
+                132000,
+                134000
+            ],
+            "block_number": 44176879
+        },
+        {
+            "pool": "0x6c561b446416e1a00e8e93e221854d6ea4171372",
+            "pool_name": "uniswap_v3::WETH/USDC",
+            "pool_address": "0x6c561b446416e1a00e8e93e221854d6ea4171372",
+            "amounts_out": [
+                "2057529010",
+                "4115050336",
+                "5143808118",
+                "10287568215"
+            ],
+            "slippage": [
+                2,
+                3,
+                4,
+                9
+            ],
+            "limit_max_in": "44971741812752315485009786172037545",
+            "limit_max_out": "39424098544978",
+            "gas_used": [
+                132000,
+                132000,
+                132000,
+                132000
+            ],
+            "block_number": 44176879
+        },
+        {
+            "pool": "0x72ab388e2e2f6facef59e3c3fa2c4e29011c2d38",
+            "pool_name": "pancakeswap_v3::WETH/USDC",
+            "pool_address": "0x72ab388e2e2f6facef59e3c3fa2c4e29011c2d38",
+            "amounts_out": [
+                "2058500574",
+                "4116801860",
+                "5145877733",
+                "10290509330"
+            ],
+            "slippage": [
+                2,
+                3,
+                4,
+                9
+            ],
+            "limit_max_in": "421144915644978001504",
+            "limit_max_out": "829191739657",
+            "gas_used": [
+                134000,
+                136000,
+                136000,
+                142000
+            ],
+            "block_number": 44176879
+        },
+        {
+            "pool": "0x88a43bbdf9d098eec7bceda4e2494615dfd9bb9c",
+            "pool_name": "uniswap_v2::WETH/USDC",
+            "pool_address": "0x88a43bbdf9d098eec7bceda4e2494615dfd9bb9c",
+            "amounts_out": [
+                "2054911626",
+                "4103487823",
+                "5125409284",
+                "10211495478"
+            ],
+            "slippage": [
+                6,
+                5,
+                13,
+                10
+            ],
+            "limit_max_in": "1393981206525617414520",
+            "limit_max_out": "9073173874356180",
+            "gas_used": [
+                120000,
+                120000,
+                120000,
+                120000
+            ],
+            "block_number": 44176879
+        },
+        {
+            "pool": "0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59",
+            "pool_name": "aerodrome_slipstreams::WETH/USDC",
+            "pool_address": "0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59",
+            "amounts_out": [
+                "2058696063",
+                "4117336625",
+                "5146636094",
+                "10292925329"
+            ],
+            "slippage": [
+                2,
+                3,
+                4,
+                9
+            ],
+            "limit_max_in": "4295923866352799869365149109012271",
+            "limit_max_out": "4712170785984",
+            "gas_used": [
+                132000,
+                132000,
+                132000,
+                132000
+            ],
+            "block_number": 44176879
+        },
+        {
+            "pool": "0xb4cb800910b228ed3d0834cf79d697127bbb00e5",
+            "pool_name": "uniswap_v3::WETH/USDC",
+            "pool_address": "0xb4cb800910b228ed3d0834cf79d697127bbb00e5",
+            "amounts_out": [
+                "2054891770",
+                "4101798963",
+                "5122288179",
+                "10195027033"
+            ],
+            "slippage": [
+                7,
+                6,
+                16,
+                10
+            ],
+            "limit_max_in": "35791934618035184575755",
+            "limit_max_out": "55893743006",
+            "gas_used": [
+                136000,
+                144000,
+                146000,
+                174000
+            ],
+            "block_number": 44176879
+        },
+        {
+            "pool": "0xb775272e537cc670c65dc852908ad47015244eaf",
+            "pool_name": "pancakeswap_v3::WETH/USDC",
+            "pool_address": "0xb775272e537cc670c65dc852908ad47015244eaf",
+            "amounts_out": [
+                "2058428176",
+                "4116512730",
+                "5145427284",
+                "10288726543"
+            ],
+            "slippage": [
+                3,
+                3,
+                4,
+                9
+            ],
+            "limit_max_in": "17273240710333874332067226954693",
+            "limit_max_out": "796652063316",
+            "gas_used": [
+                132000,
+                134000,
+                134000,
+                134000
+            ],
+            "block_number": 44176879
+        },
+        {
+            "pool": "0xc758d81b9b81a6fcdad075bd471874a2c46b54e0",
+            "pool_name": "aerodrome_slipstreams::WETH/USDC",
+            "pool_address": "0xc758d81b9b81a6fcdad075bd471874a2c46b54e0",
+            "amounts_out": [
+                "2057644754",
+                "4113117376",
+                "5140040212",
+                "10266536247"
+            ],
+            "slippage": [
+                4,
+                4,
+                7,
+                9
+            ],
+            "limit_max_in": "2051958806128686117927303853478",
+            "limit_max_out": "102316002750",
+            "gas_used": [
+                132000,
+                132000,
+                132000,
+                134000
+            ],
+            "block_number": 44176879
+        },
+        {
+            "pool": "0xd0b53d9277642d899df5c87a3966a349a798f224",
+            "pool_name": "uniswap_v3::WETH/USDC",
+            "pool_address": "0xd0b53d9277642d899df5c87a3966a349a798f224",
+            "amounts_out": [
+                "2058515751",
+                "4116862573",
+                "5145972643",
+                "10290887126"
+            ],
+            "slippage": [
+                2,
+                3,
+                4,
+                9
+            ],
+            "limit_max_in": "64114269979750797757372417724577000",
+            "limit_max_out": "2754373756535",
+            "gas_used": [
+                132000,
+                132000,
+                132000,
+                134000
+            ],
+            "block_number": 44176879
+        },
+        {
+            "pool": "0xdbc6998296caa1652a810dc8d3baf4a8294330f1",
+            "pool_name": "aerodrome_slipstreams::WETH/USDC",
+            "pool_address": "0xdbc6998296caa1652a810dc8d3baf4a8294330f1",
+            "amounts_out": [
+                "2057825066",
+                "4114097467",
+                "5141627181",
+                "10272615759"
+            ],
+            "slippage": [
+                3,
+                4,
+                6,
+                9
+            ],
+            "limit_max_in": "686337242295796734455592918606967",
+            "limit_max_out": "284675660678",
+            "gas_used": [
+                134000,
+                136000,
+                140000,
+                142000
+            ],
+            "block_number": 44176879
+        },
+        {
+            "pool": "0xe9d76696f8a35e2e2520e3125875c3af23f1e69c",
+            "pool_name": "pancakeswap_v3::WETH/USDC",
+            "pool_address": "0xe9d76696f8a35e2e2520e3125875c3af23f1e69c",
+            "amounts_out": [
+                "2051585907",
+                "4087789111",
+                "5099838374",
+                "10100458756"
+            ],
+            "slippage": [
+                12,
+                8,
+                28,
+                10
+            ],
+            "limit_max_in": "14998137671947790555790019194624",
+            "limit_max_out": "29686959650",
+            "gas_used": [
+                136000,
+                136000,
+                136000,
+                144000
+            ],
+            "block_number": 44176879
+        }
+    ],
+    "meta": {
+        "status": "ready",
+        "result_quality": "complete",
+        "block_number": 44176879,
+        "matching_pools": 12,
+        "candidate_pools": 12,
+        "total_pools": 1105
+    }
+}
