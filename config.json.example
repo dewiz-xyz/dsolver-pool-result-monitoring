@@ -1,0 +1,10 @@
+{
+  "database_url": "postgres://<user>:<password>@<host>:<port>/<database>",
+  "simulation_api_url": "http://<host>:<port>/simulate",
+  "poll_interval_secs": 2,
+  "api_port": 3500,
+  "retry": {
+    "max_retries": 3,
+    "initial_backoff_ms": 500
+  }
+}

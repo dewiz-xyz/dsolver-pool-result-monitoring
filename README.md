@@ -37,11 +37,17 @@ Each winner entry represents the best pool for a specific input amount:
 
 ## Configuration
 
-Edit `config.json` before running:
+A template is provided at `config.json.example`. Copy it and fill in your values:
+
+```bash
+cp config.json.example config.json
+```
+
+Then edit `config.json`:
 
 ```json
 {
-  "database_url": "postgres://rust:teste@localhost:5432/postgres",
+  "database_url": "postgres://<user>:<password>@<host>:<port>/<database>",
   "simulation_api_url": "http://<host>:<port>/simulate",
   "poll_interval_secs": 2,
   "api_port": 3500,
@@ -54,11 +60,14 @@ Edit `config.json` before running:
 
 | Field | Description |
 |---|---|
-| `simulation_api_url` | Endpoint that receives the simulation POST request |
-| `poll_interval_secs` | Seconds to wait between cycles |
+| `database_url` | PostgreSQL connection string (`postgres://user:pass@host:port/db`) |
+| `simulation_api_url` | Full URL of the simulation endpoint that receives the POST request |
+| `poll_interval_secs` | Seconds to wait between polling cycles |
 | `api_port` | Port the embedded HTTP server listens on |
-| `retry.max_retries` | Maximum retry attempts per failed request |
-| `retry.initial_backoff_ms` | Base backoff in ms; doubles on each retry (capped at 64×) |
+| `retry.max_retries` | Maximum retry attempts per failed request before skipping the cycle |
+| `retry.initial_backoff_ms` | Base backoff in ms; doubles on each retry attempt (capped at 64×) |
+
+> `config.json` is git-ignored. Never commit credentials to the repository.
 
 ### Swap request
 
