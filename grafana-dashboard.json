@@ -1,52 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_PROMETHEUS",
-      "label": "Prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "10.0.0"
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "timeseries",
-      "name": "Time series",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "gauge",
-      "name": "Gauge",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "stat",
-      "name": "Stat",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "table",
-      "name": "Table",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": []
   },
@@ -65,7 +17,7 @@
       "type": "row"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -82,7 +34,7 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
           "expr": "dsolver_winner_final_amount_out",
           "legendFormat": "{{pool_name}} (in={{amount_in}})",
           "refId": "A"
@@ -92,7 +44,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -109,7 +61,7 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
           "expr": "dsolver_winner_amount_out",
           "legendFormat": "{{pool_name}} (in={{amount_in}})",
           "refId": "A"
@@ -119,7 +71,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -136,7 +88,7 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
           "expr": "dsolver_winner_slippage_bps",
           "legendFormat": "{{pool_name}} (in={{amount_in}})",
           "refId": "A"
@@ -146,7 +98,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -163,7 +115,7 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
           "expr": "dsolver_winner_difference_to_lowest_slippage",
           "legendFormat": "{{pool_name}} (in={{amount_in}})",
           "refId": "A"
@@ -173,7 +125,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -202,7 +154,7 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
           "expr": "dsolver_winner_has_lowest_slippage",
           "legendFormat": "{{pool_name}} (in={{amount_in}})",
           "refId": "A"
@@ -219,7 +171,7 @@
       "type": "row"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -236,7 +188,7 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
           "expr": "dsolver_best_raw_amount_out",
           "legendFormat": "{{pool_name}} (in={{amount_in}})",
           "refId": "A"
@@ -246,7 +198,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -263,7 +215,7 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
           "expr": "dsolver_best_raw_final_amount_out",
           "legendFormat": "{{pool_name}} (in={{amount_in}})",
           "refId": "A"
@@ -273,7 +225,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -290,7 +242,7 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
           "expr": "dsolver_best_raw_slippage_bps",
           "legendFormat": "{{pool_name}} (in={{amount_in}})",
           "refId": "A"
@@ -307,7 +259,7 @@
       "type": "row"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -324,7 +276,7 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
           "expr": "dsolver_low_slippage_amount_out",
           "legendFormat": "{{pool_name}} (in={{amount_in}})",
           "refId": "A"
@@ -334,7 +286,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -351,7 +303,7 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
           "expr": "dsolver_low_slippage_bps",
           "legendFormat": "{{pool_name}} (in={{amount_in}})",
           "refId": "A"
