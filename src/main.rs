@@ -84,7 +84,6 @@ struct BestAmountOutPool {
     amount_in: String,
     amount_out: String,
     slippage: i64,
-    final_amount_out: String,
     block_number: u64,
 }
 
@@ -222,16 +221,6 @@ async fn metrics_handler(State(state): State<LatestState>) -> impl axum::respons
         let val = b.amount_out.parse::<i128>().unwrap_or(0);
         out.push_str(&format!(
             "dsolver_best_raw_amount_out{{pool_name=\"{}\",pool_address=\"{}\",amount_in=\"{}\"}} {}\n",
-            b.pool_name, b.pool_address, b.amount_in, val
-        ));
-    }
-
-    out.push_str("# HELP dsolver_best_raw_final_amount_out Post-slippage amount_out for the best raw amount_out pool\n");
-    out.push_str("# TYPE dsolver_best_raw_final_amount_out gauge\n");
-    for b in &data.best_amount_out {
-        let val = b.final_amount_out.parse::<i128>().unwrap_or(0);
-        out.push_str(&format!(
-            "dsolver_best_raw_final_amount_out{{pool_name=\"{}\",pool_address=\"{}\",amount_in=\"{}\"}} {}\n",
             b.pool_name, b.pool_address, b.amount_in, val
         ));
     }
@@ -412,8 +401,6 @@ async fn simulate_once(
         let amount_in = sim_request.amounts.get(idx).cloned().unwrap_or_default();
         let amount_out = best_raw.amounts_out.get(idx).cloned().unwrap_or_default();
         let slippage = best_raw.slippage.get(idx).copied().unwrap_or(0);
-        let raw_out = amount_out.parse::<i128>().unwrap_or(0);
-        let final_amount_out = (raw_out * (10000 + slippage as i128) / 10000).to_string();
 
         tracing::info!(
             index = idx,
@@ -428,7 +415,6 @@ async fn simulate_once(
             amount_in,
             amount_out,
             slippage,
-            final_amount_out,
             block_number: best_raw.block_number,
         });
     }

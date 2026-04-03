@@ -38,6 +38,13 @@ sudo systemctl stop grafana-server || true
 echo "Copying Prometheus configuration..."
 sudo cp "$SCRIPT_DIR/prometheus.yml" /etc/prometheus/prometheus.yml
 
+echo "Configuring Grafana HTTP port to 3001..."
+sudo sed -i 's/^;*\s*http_port\s*=.*/http_port = 3001/' /etc/grafana/grafana.ini
+# If the key doesn't exist yet, add it under the [server] section
+if ! sudo grep -q '^http_port = 3001' /etc/grafana/grafana.ini; then
+    sudo sed -i '/^\[server\]/a http_port = 3001' /etc/grafana/grafana.ini
+fi
+
 echo "Copying Grafana datasource configuration..."
 sudo mkdir -p /etc/grafana/provisioning/datasources
 sudo cp "$SCRIPT_DIR/grafana-datasource.yml" /etc/grafana/provisioning/datasources/dsolver.yml
