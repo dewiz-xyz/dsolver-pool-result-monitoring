@@ -1,0 +1,44 @@
+[
+    {
+        "amountIn": "279000000000000000000",
+        "amountOut": "514806545273921627",
+        "percentage": "10000",
+        "poolAddress": "0x6a091a3406e0073c3cd6340122143009adac0eda",
+        "poolName": "sushiswap_v2::ILV/WETH",
+        "slippage": "9"
+    },
+    {
+        "amountIn": "25740327263696081",
+        "amountOut": "52663467",
+        "percentage": "499",
+        "poolAddress": "0x1445f32d1a74872ba41f3d8cf4022e9996120b31",
+        "poolName": "pancakeswap_v3::USDC/WETH",
+        "slippage": "2"
+    },
+    {
+        "amountIn": "25740327263696081",
+        "amountOut": "52663367",
+        "percentage": "499",
+        "poolAddress": "0x4f88f7c99022eace4740c6898f59ce6a2e798a1e64ce54589720b7153eb224a7",
+        "poolName": "uniswap_v4::USDC/WETH",
+        "slippage": "3"
+    },
+    {
+        "amountIn": "463325890746529464",
+        "amountOut": "948091615",
+        "percentage": "9000",
+        "poolAddress": "0xe0554a476a092703abdb3ef35c80e0d76d32939f",
+        "poolName": "uniswap_v3::USDC/WETH",
+        "slippage": "2"
+    }
+]
+}
+],
+"trades": [
+{
+"executedAmount": "279000000000000000000",
+"fee": "0",
+"kind": "fulfillment",
+"order": "0xfc144a5afe55c3d1184ffd48c2fd5613d19f7b7c96f32f0dc75e0b601680233f02153f461c28ac0429075e3515100afdd0f2fd1269cfcbe3"
+}
+]

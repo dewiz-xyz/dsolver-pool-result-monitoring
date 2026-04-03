@@ -1,0 +1,12 @@
+{
+  "buyAmount": "1049892070",
+  "buyToken": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "class": "limit",
+  "feeAmount": "0",
+  "kind": "sell",
+  "partiallyFillable": false,
+  "sellAmount": "279000000000000000000",
+  "sellToken": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+  "uid": "0xfc144a5afe55c3d1184ffd48c2fd5613d19f7b7c96f32f0dc75e0b601680233f02153f461c28ac0429075e3515100afdd0f2fd1269cfcbe3",
+  "validTo": "1775225827"
+}
