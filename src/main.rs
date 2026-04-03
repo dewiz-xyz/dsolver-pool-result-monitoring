@@ -431,8 +431,8 @@ async fn simulate_once(
                     .amounts_out
                     .get(idx)
                     .and_then(|a| a.parse::<u128>().ok())
-                    .unwrap_or(u128::MAX);
-                (slip, amt)
+                    .unwrap_or(0); // If no amount out, treat as lowest
+                (slip, std::cmp::Reverse(amt))
             })
             .expect("non-empty pool list");
 
