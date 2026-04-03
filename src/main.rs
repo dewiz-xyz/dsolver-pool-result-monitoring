@@ -39,7 +39,6 @@ struct PoolResult {
     amounts_out: Vec<String>,
     slippage: Vec<i64>,
     limit_max_in: String,
-    limit_max_out: String,
     gas_used: Vec<u64>,
     block_number: u64,
 }
