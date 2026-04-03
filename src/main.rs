@@ -456,9 +456,8 @@ async fn simulate_once(
                 w.difference_to_lowest_slippage = "0".to_string();
             } else {
                 let winner_final = w.final_amount_out.parse::<i128>().unwrap_or(0);
-                let ls_raw = ls.amount_out.parse::<i128>().unwrap_or(0);
-                let ls_final = ls_raw * (10000 + ls.slippage as i128) / 10000;
-                w.difference_to_lowest_slippage = (winner_final - ls_final).to_string();
+                let ls_amount_out = ls.amount_out.parse::<i128>().unwrap_or(0);
+                w.difference_to_lowest_slippage = (winner_final - ls_amount_out).to_string();
             }
         }
     }
