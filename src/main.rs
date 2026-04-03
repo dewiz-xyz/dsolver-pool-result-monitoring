@@ -62,6 +62,7 @@ struct Winner {
     slippage: i64,
     block_number: u64,
     has_lowest_slippage: bool,
+    difference_to_lowest_slippage: String,
 }
 
 #[derive(Serialize, Clone)]
@@ -256,7 +257,8 @@ async fn simulate_once(
             amount_out,
             slippage,
             block_number: best.block_number,
-            has_lowest_slippage: false, // filled in below
+            has_lowest_slippage: false,         // filled in below
+            difference_to_lowest_slippage: "0".to_string(), // filled in below
         });
     }
 
@@ -293,6 +295,9 @@ async fn simulate_once(
     for (idx, w) in winners.iter_mut().enumerate() {
         if let Some(ls) = low_slippage.get(idx) {
             w.has_lowest_slippage = w.pool_address == ls.pool_address;
+            let winner_out = w.amount_out.parse::<i128>().unwrap_or(0);
+            let ls_out = ls.amount_out.parse::<i128>().unwrap_or(0);
+            w.difference_to_lowest_slippage = (winner_out - ls_out).to_string();
         }
     }
 
