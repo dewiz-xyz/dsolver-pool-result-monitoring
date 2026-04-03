@@ -425,7 +425,15 @@ async fn simulate_once(
         let best_low = sim_response
             .data
             .iter()
-            .min_by_key(|pool| pool.slippage.get(idx).copied().unwrap_or(i64::MAX))
+            .min_by_key(|pool| {
+                let slip = pool.slippage.get(idx).copied().unwrap_or(i64::MAX);
+                let amt = pool
+                    .amounts_out
+                    .get(idx)
+                    .and_then(|a| a.parse::<u128>().ok())
+                    .unwrap_or(u128::MAX);
+                (slip, amt)
+            })
             .expect("non-empty pool list");
 
         let amount_in = sim_request.amounts.get(idx).cloned().unwrap_or_default();
@@ -451,7 +459,7 @@ async fn simulate_once(
 
     for (idx, w) in winners.iter_mut().enumerate() {
         if let Some(ls) = low_slippage.get(idx) {
-            w.has_lowest_slippage = w.pool_address == ls.pool_address;
+            w.has_lowest_slippage = w.slippage == ls.slippage;
             let winner_final = w.final_amount_out.parse::<i128>().unwrap_or(0);
             let ls_amount_out = ls.amount_out.parse::<i128>().unwrap_or(0);
             w.difference_to_lowest_slippage = (winner_final - ls_amount_out).to_string();
