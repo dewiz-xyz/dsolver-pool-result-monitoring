@@ -38,6 +38,16 @@ sudo systemctl stop grafana-server || true
 echo "Copying Prometheus configuration..."
 sudo cp "$SCRIPT_DIR/prometheus.yml" /etc/prometheus/prometheus.yml
 
+echo "Configuring Prometheus listen port to 9000..."
+if [[ -f /etc/default/prometheus ]]; then
+    sudo sed -i 's/--web.listen-address=[^ ]*/--web.listen-address=":9000"/' /etc/default/prometheus
+    if ! sudo grep -q 'web.listen-address' /etc/default/prometheus; then
+        echo 'ARGS="--web.listen-address=:9000"' | sudo tee -a /etc/default/prometheus
+    fi
+else
+    echo 'ARGS="--web.listen-address=:9000"' | sudo tee /etc/default/prometheus
+fi
+
 echo "Configuring Grafana HTTP port to 3001..."
 sudo sed -i 's/^;*\s*http_port\s*=.*/http_port = 3001/' /etc/grafana/grafana.ini
 # If the key doesn't exist yet, add it under the [server] section
