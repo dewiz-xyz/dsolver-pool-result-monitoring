@@ -61,11 +61,21 @@ struct Winner {
     amount_out: String,
     slippage: i64,
     block_number: u64,
+    has_lowest_slippage: bool,
+}
+
+#[derive(Serialize, Clone)]
+struct LowSlippagePool {
+    pool_name: String,
+    pool_address: String,
+    total_slippage: i64,
+    block_number: u64,
 }
 
 #[derive(Serialize)]
 struct OutputResult {
     winners: Vec<Winner>,
+    low_slippage: LowSlippagePool,
     original_response: Value,
 }
 
@@ -234,7 +244,31 @@ async fn simulate_once(
             amount_out,
             slippage,
             block_number: best.block_number,
+            has_lowest_slippage: false, // filled in below
         });
+    }
+
+    let low_slippage_pool = sim_response
+        .data
+        .iter()
+        .min_by_key(|pool| pool.slippage.iter().sum::<i64>())
+        .expect("non-empty pool list");
+
+    let low_slippage = LowSlippagePool {
+        pool_name: low_slippage_pool.pool_name.clone(),
+        pool_address: low_slippage_pool.pool_address.clone(),
+        total_slippage: low_slippage_pool.slippage.iter().sum(),
+        block_number: low_slippage_pool.block_number,
+    };
+
+    tracing::info!(
+        pool = %low_slippage.pool_name,
+        total_slippage = %low_slippage.total_slippage,
+        "lowest slippage pool"
+    );
+
+    for w in &mut winners {
+        w.has_lowest_slippage = w.pool_address == low_slippage.pool_address;
     }
 
     let block_number = winners.first().map(|w| w.block_number).unwrap_or(0);
@@ -248,6 +282,7 @@ async fn simulate_once(
 
     let output = OutputResult {
         winners,
+        low_slippage,
         original_response,
     };
 
