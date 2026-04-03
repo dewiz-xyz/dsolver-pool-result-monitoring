@@ -294,10 +294,14 @@ async fn simulate_once(
 
     for (idx, w) in winners.iter_mut().enumerate() {
         if let Some(ls) = low_slippage.get(idx) {
-            w.has_lowest_slippage = w.pool_address == ls.pool_address;
-            let winner_out = w.amount_out.parse::<i128>().unwrap_or(0);
-            let ls_out = ls.amount_out.parse::<i128>().unwrap_or(0);
-            w.difference_to_lowest_slippage = (winner_out - ls_out).to_string();
+            w.has_lowest_slippage = w.pool_address == ls.pool_address || w.slippage == ls.slippage;
+            if w.has_lowest_slippage {
+                w.difference_to_lowest_slippage = "0".to_string();
+            } else {
+                let winner_out = w.amount_out.parse::<i128>().unwrap_or(0);
+                let ls_out = ls.amount_out.parse::<i128>().unwrap_or(0);
+                w.difference_to_lowest_slippage = (winner_out - ls_out).to_string();
+            }
         }
     }
 
