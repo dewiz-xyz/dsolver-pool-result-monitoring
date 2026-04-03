@@ -60,6 +60,7 @@ struct Winner {
     amount_in: String,
     amount_out: String,
     slippage: i64,
+    final_amount_out: String,
     block_number: u64,
     has_lowest_slippage: bool,
     difference_to_lowest_slippage: String,
@@ -75,10 +76,23 @@ struct LowSlippagePool {
     block_number: u64,
 }
 
+#[derive(Serialize, Clone)]
+struct BestAmountOutPool {
+    pool_name: String,
+    pool_address: String,
+    amount_in: String,
+    amount_out: String,
+    slippage: i64,
+    final_amount_out: String,
+    block_number: u64,
+}
+
 #[derive(Serialize)]
 struct OutputResult {
     winners: Vec<Winner>,
+    best_amount_out: Vec<BestAmountOutPool>,
     low_slippage: Vec<LowSlippagePool>,
+    pools: Vec<PoolResult>,
     original_response: Value,
 }
 
@@ -91,13 +105,16 @@ struct PoolWinnersResponse {
 #[derive(Serialize)]
 struct LatestResponse {
     winners: Vec<Winner>,
+    best_amount_out: Vec<BestAmountOutPool>,
     low_slippage: Vec<LowSlippagePool>,
 }
 
 #[derive(Clone, Default)]
 struct LatestData {
     winners: Vec<Winner>,
+    best_amount_out: Vec<BestAmountOutPool>,
     low_slippage: Vec<LowSlippagePool>,
+    pools: Vec<PoolResult>,
 }
 
 type LatestState = Arc<RwLock<LatestData>>;
@@ -140,6 +157,7 @@ async fn latest_handler(State(state): State<LatestState>) -> Json<LatestResponse
     let data = state.read().await.clone();
     Json(LatestResponse {
         winners: data.winners,
+        best_amount_out: data.best_amount_out,
         low_slippage: data.low_slippage,
     })
 }
@@ -231,22 +249,27 @@ async fn simulate_once(
             .data
             .iter()
             .max_by_key(|pool| {
-                pool.amounts_out
+                let raw = pool.amounts_out
                     .get(idx)
-                    .and_then(|a| a.parse::<u128>().ok())
-                    .unwrap_or(0)
+                    .and_then(|a| a.parse::<i128>().ok())
+                    .unwrap_or(0);
+                let slip = pool.slippage.get(idx).copied().unwrap_or(0) as i128;
+                (raw * (10000 + slip) / 10000).max(0) as u128
             })
             .expect("non-empty pool list");
 
         let amount_in = sim_request.amounts.get(idx).cloned().unwrap_or_default();
         let amount_out = best.amounts_out.get(idx).cloned().unwrap_or_default();
         let slippage = best.slippage.get(idx).copied().unwrap_or(0);
+        let raw_out = amount_out.parse::<i128>().unwrap_or(0);
+        let final_amount_out = (raw_out * (10000 + slippage as i128) / 10000).to_string();
 
         tracing::info!(
             index = idx,
             pool = %best.pool_name,
             amount_in = %amount_in,
             amount_out = %amount_out,
+            final_amount_out = %final_amount_out,
             "winner for amounts_out[{}]", idx
         );
 
@@ -256,9 +279,48 @@ async fn simulate_once(
             amount_in,
             amount_out,
             slippage,
+            final_amount_out,
             block_number: best.block_number,
             has_lowest_slippage: false,         // filled in below
             difference_to_lowest_slippage: "0".to_string(), // filled in below
+        });
+    }
+
+    let mut best_amount_out: Vec<BestAmountOutPool> = Vec::with_capacity(num_amounts);
+
+    for idx in 0..num_amounts {
+        let best_raw = sim_response
+            .data
+            .iter()
+            .max_by_key(|pool| {
+                pool.amounts_out
+                    .get(idx)
+                    .and_then(|a| a.parse::<u128>().ok())
+                    .unwrap_or(0)
+            })
+            .expect("non-empty pool list");
+
+        let amount_in = sim_request.amounts.get(idx).cloned().unwrap_or_default();
+        let amount_out = best_raw.amounts_out.get(idx).cloned().unwrap_or_default();
+        let slippage = best_raw.slippage.get(idx).copied().unwrap_or(0);
+        let raw_out = amount_out.parse::<i128>().unwrap_or(0);
+        let final_amount_out = (raw_out * (10000 + slippage as i128) / 10000).to_string();
+
+        tracing::info!(
+            index = idx,
+            pool = %best_raw.pool_name,
+            amount_out = %amount_out,
+            "best raw amount_out for amounts[{}]", idx
+        );
+
+        best_amount_out.push(BestAmountOutPool {
+            pool_name: best_raw.pool_name.clone(),
+            pool_address: best_raw.pool_address.clone(),
+            amount_in,
+            amount_out,
+            slippage,
+            final_amount_out,
+            block_number: best_raw.block_number,
         });
     }
 
@@ -298,9 +360,10 @@ async fn simulate_once(
             if w.has_lowest_slippage {
                 w.difference_to_lowest_slippage = "0".to_string();
             } else {
-                let winner_out = w.amount_out.parse::<i128>().unwrap_or(0);
-                let ls_out = ls.amount_out.parse::<i128>().unwrap_or(0);
-                w.difference_to_lowest_slippage = (winner_out - ls_out).to_string();
+                let winner_final = w.final_amount_out.parse::<i128>().unwrap_or(0);
+                let ls_raw = ls.amount_out.parse::<i128>().unwrap_or(0);
+                let ls_final = ls_raw * (10000 + ls.slippage as i128) / 10000;
+                w.difference_to_lowest_slippage = (winner_final - ls_final).to_string();
             }
         }
     }
@@ -312,15 +375,21 @@ async fn simulate_once(
     let filename = format!("sim-result-{}-{}.json", block_number, datetime_str);
     let output_path = Path::new("result-data").join(&filename);
 
+    let pools = sim_response.data.clone();
+
     {
         let mut data = latest.write().await;
         data.winners = winners.clone();
+        data.best_amount_out = best_amount_out.clone();
         data.low_slippage = low_slippage.clone();
+        data.pools = pools.clone();
     }
 
     let output = OutputResult {
         winners,
+        best_amount_out,
         low_slippage,
+        pools,
         original_response,
     };
 
