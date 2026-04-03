@@ -48,11 +48,14 @@ else
     echo 'ARGS="--web.listen-address=:9000"' | sudo tee /etc/default/prometheus
 fi
 
-echo "Configuring Grafana HTTP port to 3001..."
+echo "Configuring Grafana HTTP port to 3001 and binding to all interfaces..."
 sudo sed -i 's/^;*\s*http_port\s*=.*/http_port = 3001/' /etc/grafana/grafana.ini
-# If the key doesn't exist yet, add it under the [server] section
 if ! sudo grep -q '^http_port = 3001' /etc/grafana/grafana.ini; then
     sudo sed -i '/^\[server\]/a http_port = 3001' /etc/grafana/grafana.ini
+fi
+sudo sed -i 's/^;*\s*http_addr\s*=.*/http_addr =/' /etc/grafana/grafana.ini
+if ! sudo grep -q '^http_addr =' /etc/grafana/grafana.ini; then
+    sudo sed -i '/^\[server\]/a http_addr =' /etc/grafana/grafana.ini
 fi
 
 echo "Copying Grafana datasource configuration..."
