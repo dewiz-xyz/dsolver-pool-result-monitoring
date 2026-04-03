@@ -9,10 +9,13 @@ A Rust service that continuously polls a DEX simulation API to find the best-pay
 Every `poll_interval_secs` seconds the service:
 
 1. Reads `request-model.json` and POSTs it to `simulation_api_url`.
-2. Receives a list of pool simulation results, each containing an `amounts_out` array that corresponds 1-to-1 with the `amounts` array in the request.
-3. For each index position, finds the pool that returns the highest `amount_out` — producing one **winner per input amount**.
-4. Writes the winners and the raw server response to `result-data/sim-result-{blocknumber}-{hhmmssyyyyoodd}.json`.
-5. Keeps the latest winner set in memory for instant retrieval via the API.
+2. Receives a list of pool simulation results, each containing an `amounts_out` and `slippage` array that correspond 1-to-1 with the `amounts` array in the request.
+3. For each index position, finds:
+   - The pool that returns the highest `amount_out` — the **winner** for that input amount.
+   - The pool that returns the lowest `slippage` — the **low-slippage pool** for that input amount.
+4. Marks each winner with `has_lowest_slippage: true` when it is also the lowest-slippage pool for that index.
+5. Writes winners, low-slippage pools, and the raw server response to `result-data/sim-result-{blocknumber}-{hhmmssyyyyoodd}.json`.
+6. Keeps the latest results in memory for instant retrieval via the API.
 
 Failed requests are retried with exponential backoff up to `max_retries` times before the cycle is logged as an error and skipped (the service keeps running).
 
@@ -20,7 +23,7 @@ Failed requests are retried with exponential backoff up to `max_retries` times b
 
 ## Winner object
 
-Each winner entry represents the best pool for a specific input amount:
+Each winner entry represents the best pool (highest `amount_out`) for a specific input amount:
 
 ```json
 {
@@ -29,6 +32,24 @@ Each winner entry represents the best pool for a specific input amount:
   "amount_in": "1000000000000000000",
   "amount_out": "2057033206",
   "slippage": 2,
+  "block_number": 44179002,
+  "has_lowest_slippage": false
+}
+```
+
+`has_lowest_slippage` is `true` when the winning pool for that index is also the pool with the lowest slippage for the same input amount.
+
+## LowSlippagePool object
+
+Each low-slippage entry represents the pool with the lowest `slippage` for a specific input amount:
+
+```json
+{
+  "pool_name": "uniswap_v3::WETH/USDC",
+  "pool_address": "0xabcdef1234567890abcdef1234567890abcdef12",
+  "amount_in": "1000000000000000000",
+  "amount_out": "2050000000",
+  "slippage": 0,
   "block_number": 44179002
 }
 ```
@@ -105,8 +126,13 @@ RUSTFLAGS="-C target-cpu=native -C link-arg=-s" cargo build --release
 ./start.sh
 ```
 
-Starts the service in the background, prints the PID, and tails `system-monitoring.log` live.  
-Press `Ctrl+C` to stop tailing — the service keeps running.
+Starts the service in the background and prints the PID and log file path. The `result-data/` directory is created automatically if it does not exist.
+
+To follow the log output, copy and run the hint printed by the script:
+
+```bash
+tail -f /path/to/system-monitoring.log
+```
 
 ### Stop
 
@@ -150,7 +176,7 @@ Response:
 
 ### `GET /result/latest`
 
-Returns the winner set from the **most recent completed cycle**, served directly from memory (no disk I/O).
+Returns the results from the **most recent completed cycle**, served directly from memory (no disk I/O). Both arrays are index-aligned with the `amounts` array in `request-model.json`.
 
 ```bash
 curl http://localhost:3500/result/latest
@@ -160,13 +186,25 @@ Response:
 
 ```json
 {
-  "latest": [
+  "winners": [
     {
       "pool_name": "pancakeswap_v3::WETH/USDC",
       "pool_address": "0x72ab388e...",
       "amount_in": "1000000000000000000",
       "amount_out": "2057033206",
       "slippage": 2,
+      "block_number": 44179002,
+      "has_lowest_slippage": false
+    },
+    ...
+  ],
+  "low_slippage": [
+    {
+      "pool_name": "uniswap_v3::WETH/USDC",
+      "pool_address": "0xabcdef12...",
+      "amount_in": "1000000000000000000",
+      "amount_out": "2050000000",
+      "slippage": 0,
       "block_number": 44179002
     },
     ...
@@ -191,11 +229,22 @@ File structure:
 ```json
 {
   "winners": [ ... ],
+  "low_slippage": [ ... ],
   "original_response": { ... }
 }
 ```
 
-`original_response` contains the full unmodified payload returned by the simulation API.
+`winners` and `low_slippage` are both arrays indexed by input amount position. `original_response` contains the full unmodified payload returned by the simulation API.
+
+---
+
+## Update
+
+```bash
+./update.sh
+```
+
+Pulls the latest changes from the repository, rebuilds the release binary, and clears all JSON files inside `result-data/`. If `result-data/` does not exist it is created automatically.
 
 ---
 

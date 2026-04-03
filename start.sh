@@ -22,5 +22,6 @@ PID=$!
 echo "Started dsolver-pool-result-monitoring"
 echo "PID: $PID"
 echo "Log: $LOG_FILE"
-
-tail -f "$LOG_FILE"
+echo ""
+echo "To follow the log, run:"
+echo "  tail -f $LOG_FILE"
