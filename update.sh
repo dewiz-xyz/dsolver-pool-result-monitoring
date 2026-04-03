@@ -60,7 +60,9 @@ fi
 
 echo "Copying Grafana datasource configuration..."
 sudo mkdir -p /etc/grafana/provisioning/datasources
+sudo find /etc/grafana/provisioning/datasources -maxdepth 1 -name "*.yml" -o -name "*.yaml" | sudo xargs rm -f 2>/dev/null || true
 sudo cp "$SCRIPT_DIR/grafana-datasource.yml" /etc/grafana/provisioning/datasources/dsolver.yml
+sudo chown grafana:grafana /etc/grafana/provisioning/datasources/dsolver.yml
 
 echo "Copying Grafana dashboard provisioning configuration..."
 sudo mkdir -p /etc/grafana/provisioning/dashboards

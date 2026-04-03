@@ -6,7 +6,7 @@ datasources:
     uid: DS_PROMETHEUS
     access: proxy
     url: http://localhost:9000
-    isDefault: true
+    isDefault: false
     editable: true
     jsonData:
       timeInterval: 6s
