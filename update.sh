@@ -30,3 +30,33 @@ else
     find "$SCRIPT_DIR/result-data" -maxdepth 1 -name "*.json" -delete
     echo "result-data cleared."
 fi
+
+echo "Stopping Prometheus and Grafana..."
+sudo systemctl stop prometheus || true
+sudo systemctl stop grafana-server || true
+
+echo "Copying Prometheus configuration..."
+sudo cp "$SCRIPT_DIR/prometheus.yml" /etc/prometheus/prometheus.yml
+
+echo "Copying Grafana datasource configuration..."
+sudo mkdir -p /etc/grafana/provisioning/datasources
+sudo cp "$SCRIPT_DIR/grafana-datasource.yml" /etc/grafana/provisioning/datasources/dsolver.yml
+
+echo "Copying Grafana dashboard provisioning configuration..."
+sudo mkdir -p /etc/grafana/provisioning/dashboards
+sudo cp "$SCRIPT_DIR/grafana-dashboard-provisioning.yml" /etc/grafana/provisioning/dashboards/dsolver.yml
+
+echo "Copying Grafana dashboard JSON..."
+sudo cp "$SCRIPT_DIR/grafana-dashboard.json" /etc/grafana/provisioning/dashboards/dsolver-dashboard.json
+
+echo "Starting Prometheus and Grafana..."
+sudo systemctl start prometheus
+sudo systemctl start grafana-server
+
+echo "Prometheus status:"
+sudo systemctl is-active prometheus
+
+echo "Grafana status:"
+sudo systemctl is-active grafana-server
+
+echo "Update complete."

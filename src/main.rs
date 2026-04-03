@@ -3,6 +3,7 @@ use axum::{
     Json,
     Router,
     extract::State,
+    http::header,
     routing::get,
 };
 use chrono::Local;
@@ -162,10 +163,118 @@ async fn latest_handler(State(state): State<LatestState>) -> Json<LatestResponse
     })
 }
 
+async fn metrics_handler(State(state): State<LatestState>) -> impl axum::response::IntoResponse {
+    let data = state.read().await.clone();
+    let mut out = String::new();
+
+    out.push_str("# HELP dsolver_winner_amount_out Raw amount_out for the winning pool per amount_in\n");
+    out.push_str("# TYPE dsolver_winner_amount_out gauge\n");
+    for w in &data.winners {
+        let val = w.amount_out.parse::<i128>().unwrap_or(0);
+        out.push_str(&format!(
+            "dsolver_winner_amount_out{{pool_name=\"{}\",pool_address=\"{}\",amount_in=\"{}\"}} {}\n",
+            w.pool_name, w.pool_address, w.amount_in, val
+        ));
+    }
+
+    out.push_str("# HELP dsolver_winner_final_amount_out Post-slippage amount_out for the winning pool\n");
+    out.push_str("# TYPE dsolver_winner_final_amount_out gauge\n");
+    for w in &data.winners {
+        let val = w.final_amount_out.parse::<i128>().unwrap_or(0);
+        out.push_str(&format!(
+            "dsolver_winner_final_amount_out{{pool_name=\"{}\",pool_address=\"{}\",amount_in=\"{}\"}} {}\n",
+            w.pool_name, w.pool_address, w.amount_in, val
+        ));
+    }
+
+    out.push_str("# HELP dsolver_winner_slippage_bps Slippage in basis points for the winning pool\n");
+    out.push_str("# TYPE dsolver_winner_slippage_bps gauge\n");
+    for w in &data.winners {
+        out.push_str(&format!(
+            "dsolver_winner_slippage_bps{{pool_name=\"{}\",pool_address=\"{}\",amount_in=\"{}\"}} {}\n",
+            w.pool_name, w.pool_address, w.amount_in, w.slippage
+        ));
+    }
+
+    out.push_str("# HELP dsolver_winner_has_lowest_slippage 1 if the winner also has the lowest slippage\n");
+    out.push_str("# TYPE dsolver_winner_has_lowest_slippage gauge\n");
+    for w in &data.winners {
+        let val = if w.has_lowest_slippage { 1 } else { 0 };
+        out.push_str(&format!(
+            "dsolver_winner_has_lowest_slippage{{pool_name=\"{}\",pool_address=\"{}\",amount_in=\"{}\"}} {}\n",
+            w.pool_name, w.pool_address, w.amount_in, val
+        ));
+    }
+
+    out.push_str("# HELP dsolver_winner_difference_to_lowest_slippage Difference in final_amount_out between winner and lowest slippage pool\n");
+    out.push_str("# TYPE dsolver_winner_difference_to_lowest_slippage gauge\n");
+    for w in &data.winners {
+        let val = w.difference_to_lowest_slippage.parse::<i128>().unwrap_or(0);
+        out.push_str(&format!(
+            "dsolver_winner_difference_to_lowest_slippage{{pool_name=\"{}\",pool_address=\"{}\",amount_in=\"{}\"}} {}\n",
+            w.pool_name, w.pool_address, w.amount_in, val
+        ));
+    }
+
+    out.push_str("# HELP dsolver_best_raw_amount_out Best raw amount_out per amount_in index\n");
+    out.push_str("# TYPE dsolver_best_raw_amount_out gauge\n");
+    for b in &data.best_amount_out {
+        let val = b.amount_out.parse::<i128>().unwrap_or(0);
+        out.push_str(&format!(
+            "dsolver_best_raw_amount_out{{pool_name=\"{}\",pool_address=\"{}\",amount_in=\"{}\"}} {}\n",
+            b.pool_name, b.pool_address, b.amount_in, val
+        ));
+    }
+
+    out.push_str("# HELP dsolver_best_raw_final_amount_out Post-slippage amount_out for the best raw amount_out pool\n");
+    out.push_str("# TYPE dsolver_best_raw_final_amount_out gauge\n");
+    for b in &data.best_amount_out {
+        let val = b.final_amount_out.parse::<i128>().unwrap_or(0);
+        out.push_str(&format!(
+            "dsolver_best_raw_final_amount_out{{pool_name=\"{}\",pool_address=\"{}\",amount_in=\"{}\"}} {}\n",
+            b.pool_name, b.pool_address, b.amount_in, val
+        ));
+    }
+
+    out.push_str("# HELP dsolver_best_raw_slippage_bps Slippage in basis points for the best raw amount_out pool\n");
+    out.push_str("# TYPE dsolver_best_raw_slippage_bps gauge\n");
+    for b in &data.best_amount_out {
+        out.push_str(&format!(
+            "dsolver_best_raw_slippage_bps{{pool_name=\"{}\",pool_address=\"{}\",amount_in=\"{}\"}} {}\n",
+            b.pool_name, b.pool_address, b.amount_in, b.slippage
+        ));
+    }
+
+    out.push_str("# HELP dsolver_low_slippage_amount_out Amount_out for the lowest slippage pool per amount_in index\n");
+    out.push_str("# TYPE dsolver_low_slippage_amount_out gauge\n");
+    for ls in &data.low_slippage {
+        let val = ls.amount_out.parse::<i128>().unwrap_or(0);
+        out.push_str(&format!(
+            "dsolver_low_slippage_amount_out{{pool_name=\"{}\",pool_address=\"{}\",amount_in=\"{}\"}} {}\n",
+            ls.pool_name, ls.pool_address, ls.amount_in, val
+        ));
+    }
+
+    out.push_str("# HELP dsolver_low_slippage_bps Slippage in basis points for the lowest slippage pool\n");
+    out.push_str("# TYPE dsolver_low_slippage_bps gauge\n");
+    for ls in &data.low_slippage {
+        out.push_str(&format!(
+            "dsolver_low_slippage_bps{{pool_name=\"{}\",pool_address=\"{}\",amount_in=\"{}\"}} {}\n",
+            ls.pool_name, ls.pool_address, ls.amount_in, ls.slippage
+        ));
+    }
+
+    (
+        [(header::CONTENT_TYPE, "text/plain; version=0.0.4; charset=utf-8")],
+        out,
+    )
+}
+
 async fn start_api_server(port: u16, latest: LatestState) {
     let app = Router::new()
         .route("/result", get(result_handler))
         .route("/result/latest", get(latest_handler))
+        .route("/metrics", get(metrics_handler))
         .with_state(latest);
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     let listener = TcpListener::bind(addr)
