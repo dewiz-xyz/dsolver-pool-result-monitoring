@@ -68,14 +68,16 @@ struct Winner {
 struct LowSlippagePool {
     pool_name: String,
     pool_address: String,
-    total_slippage: i64,
+    amount_in: String,
+    amount_out: String,
+    slippage: i64,
     block_number: u64,
 }
 
 #[derive(Serialize)]
 struct OutputResult {
     winners: Vec<Winner>,
-    low_slippage: LowSlippagePool,
+    low_slippage: Vec<LowSlippagePool>,
     original_response: Value,
 }
 
@@ -87,10 +89,17 @@ struct PoolWinnersResponse {
 
 #[derive(Serialize)]
 struct LatestResponse {
-    latest: Vec<Winner>,
+    winners: Vec<Winner>,
+    low_slippage: Vec<LowSlippagePool>,
 }
 
-type LatestState = Arc<RwLock<Vec<Winner>>>;
+#[derive(Clone, Default)]
+struct LatestData {
+    winners: Vec<Winner>,
+    low_slippage: Vec<LowSlippagePool>,
+}
+
+type LatestState = Arc<RwLock<LatestData>>;
 
 async fn result_handler() -> Json<PoolWinnersResponse> {
     let mut pool_winners: Vec<Value> = Vec::new();
@@ -127,8 +136,11 @@ async fn result_handler() -> Json<PoolWinnersResponse> {
 }
 
 async fn latest_handler(State(state): State<LatestState>) -> Json<LatestResponse> {
-    let latest = state.read().await.clone();
-    Json(LatestResponse { latest })
+    let data = state.read().await.clone();
+    Json(LatestResponse {
+        winners: data.winners,
+        low_slippage: data.low_slippage,
+    })
 }
 
 async fn start_api_server(port: u16, latest: LatestState) {
@@ -248,27 +260,40 @@ async fn simulate_once(
         });
     }
 
-    let low_slippage_pool = sim_response
-        .data
-        .iter()
-        .min_by_key(|pool| pool.slippage.iter().sum::<i64>())
-        .expect("non-empty pool list");
+    let mut low_slippage: Vec<LowSlippagePool> = Vec::with_capacity(num_amounts);
 
-    let low_slippage = LowSlippagePool {
-        pool_name: low_slippage_pool.pool_name.clone(),
-        pool_address: low_slippage_pool.pool_address.clone(),
-        total_slippage: low_slippage_pool.slippage.iter().sum(),
-        block_number: low_slippage_pool.block_number,
-    };
+    for idx in 0..num_amounts {
+        let best_low = sim_response
+            .data
+            .iter()
+            .min_by_key(|pool| pool.slippage.get(idx).copied().unwrap_or(i64::MAX))
+            .expect("non-empty pool list");
 
-    tracing::info!(
-        pool = %low_slippage.pool_name,
-        total_slippage = %low_slippage.total_slippage,
-        "lowest slippage pool"
-    );
+        let amount_in = sim_request.amounts.get(idx).cloned().unwrap_or_default();
+        let amount_out = best_low.amounts_out.get(idx).cloned().unwrap_or_default();
+        let slippage = best_low.slippage.get(idx).copied().unwrap_or(0);
 
-    for w in &mut winners {
-        w.has_lowest_slippage = w.pool_address == low_slippage.pool_address;
+        tracing::info!(
+            index = idx,
+            pool = %best_low.pool_name,
+            slippage = %slippage,
+            "lowest slippage pool for amounts[{}]", idx
+        );
+
+        low_slippage.push(LowSlippagePool {
+            pool_name: best_low.pool_name.clone(),
+            pool_address: best_low.pool_address.clone(),
+            amount_in,
+            amount_out,
+            slippage,
+            block_number: best_low.block_number,
+        });
+    }
+
+    for (idx, w) in winners.iter_mut().enumerate() {
+        if let Some(ls) = low_slippage.get(idx) {
+            w.has_lowest_slippage = w.pool_address == ls.pool_address;
+        }
     }
 
     let block_number = winners.first().map(|w| w.block_number).unwrap_or(0);
@@ -278,7 +303,11 @@ async fn simulate_once(
     let filename = format!("sim-result-{}-{}.json", block_number, datetime_str);
     let output_path = Path::new("result-data").join(&filename);
 
-*latest.write().await = winners.clone();
+    {
+        let mut data = latest.write().await;
+        data.winners = winners.clone();
+        data.low_slippage = low_slippage.clone();
+    }
 
     let output = OutputResult {
         winners,
@@ -335,7 +364,7 @@ async fn main() -> Result<()> {
         "starting — press Ctrl+C to stop"
     );
 
-    let latest: LatestState = Arc::new(RwLock::new(Vec::new()));
+    let latest: LatestState = Arc::new(RwLock::new(LatestData::default()));
 
     let api_port = config.api_port;
     let api_task = tokio::spawn(start_api_server(api_port, Arc::clone(&latest)));
